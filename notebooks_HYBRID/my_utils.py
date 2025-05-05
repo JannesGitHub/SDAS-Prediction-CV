@@ -505,49 +505,47 @@ def calculate_avg_sdas(lines):
     return avg_sdas
 
 def getResults(test_dir, model, diameter, MAX_POINTS_PER_LINE, MAX_ANGLE_DIFF_REG_P_THRESHOLD,
-                                REGRESSION_DISTANCE_THRESHOLD, ANGLE_DIFF_THRESHOLD, DISTANCE_THRESHOLD,
-                                MIN_POINTS_PER_LINE, MICROMETER_PER_PIXEL):
+               REGRESSION_DISTANCE_THRESHOLD, ANGLE_DIFF_THRESHOLD, DISTANCE_THRESHOLD,
+               MIN_POINTS_PER_LINE, MICROMETER_PER_PIXEL):
+    
     results = []
+    img_files = [f for f in os.listdir(test_dir) if f.endswith('.jpg') or f.endswith('.png')]
+    total = len(img_files)
 
-    # for all images in test_dir
-    for img_name in os.listdir(test_dir):
-        if img_name.endswith('.jpg') or img_name.endswith('.png'):
+    for i, img_name in enumerate(img_files):
+        # Gruppiertes Print alle 5 Bilder
+        if i % 5 == 0:
+            batch_files = img_files[i:i+5]
+            print(f"Verarbeite Bilder {min(i+5, total)}/{total}: {', '.join(batch_files)}")
 
-            # Predict SDAS for current image
+        img_path = os.path.join(test_dir, img_name)
+        img = cv2.imread(img_path)
 
-            print(img_name)
+        # Model-Inferenz
+        masks, flows, styles, imgs_dn = model.eval(img, diameter=diameter, channels=[0, 0])
 
-            print("loading image...")
-            
-            img_path = os.path.join(test_dir, img_name)
-            img = cv2.imread(img_path)
+        # Linien extrahieren
+        line_segments = extract_line_segments(masks)
 
-            print("run model for contours...")
-            
-            masks, flows, styles, imgs_dn = model.eval(img, diameter=diameter, channels= [0,0]) # Diameter ist entscheidend für sinnvolle Umrandunungen! -> kleinst möglicher Durchmesser der füllenden Linie
+        # Gruppierung
+        dendrite_clusters = group_line_segments_with_KDTree(
+            line_segments, MAX_POINTS_PER_LINE, MAX_ANGLE_DIFF_REG_P_THRESHOLD,
+            REGRESSION_DISTANCE_THRESHOLD, ANGLE_DIFF_THRESHOLD, DISTANCE_THRESHOLD,
+            MIN_POINTS_PER_LINE, MICROMETER_PER_PIXEL
+        )
 
-            print("exctract line information...")
-                
-            line_segments = extract_line_segments(masks)
+        # SDAS berechnen
+        SDAS_pred = calculate_avg_sdas(dendrite_clusters)
 
-            print("cluster algorithm...")
+        # SDAS-Wert aus Dateinamen extrahieren
+        try:
+            SDAS_true = float(img_name.split('_')[1])
+            results.append((SDAS_true, SDAS_pred))
+        except:
+            print(f"⚠️  Konnte SDAS-Wert aus '{img_name}' nicht extrahieren!")
 
-            dendrite_clusters = group_line_segments_with_KDTree(line_segments, MAX_POINTS_PER_LINE, MAX_ANGLE_DIFF_REG_P_THRESHOLD,
-                                REGRESSION_DISTANCE_THRESHOLD, ANGLE_DIFF_THRESHOLD, DISTANCE_THRESHOLD,
-                                MIN_POINTS_PER_LINE, MICROMETER_PER_PIXEL)
-
-            print("calculate SDAS...")
-
-            SDAS_pred = calculate_avg_sdas(dendrite_clusters)
-
-            # Extract the actual SDAS value from the filename
-            try:
-                SDAS_true = float(img_name.split('_')[1])
-                results.append((SDAS_true, SDAS_pred))
-            except:
-                print(f"Warning: Couldn't extract SDAS-value from '{img_name}'!")
-        
     return results
+
 
 def calculateMetrics(results):
     # Separate true and predicted values
