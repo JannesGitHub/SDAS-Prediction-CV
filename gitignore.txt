@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.pyc
+
+# Ordner
+/data/CNN_training_data/
+/data/paper_data/
+/logs/
+/models/
+mlruns/
+/checkpoints/
+
+# Jupyter Notebooks Checkpoints
+.ipynb_checkpoints/
+
+# MLRUNS
+mlruns/
+
+# Datentypen
+*.tsv
+*.npy
+*.pkl
+*.joblib
+*.zip
+*.pdf
+
+# Umgebungen
+.env
+venv/
+.venv/
+
+# Sonstiges
+.DS_Store
+
+# Jupyter Notebook temporary files (oft übersehen)
+*.ipynb~
+
+# Sicherungskopien & temporäre Dateien
+*~
+*.bak
+*.swp
+*.tmp
+
+# VSCode / IDE Dateien
+.vscode/
+.idea/
+
+# Weitere ML-Dateitypen
+*.h5
+*.pt
+*.ckpt
+*.onnx
+
+# Komprimierte Archive & Installers
+*.tar.gz
+*.whl# Jupyter Notebook temporary files (oft übersehen)
+*.ipynb~
+
+# Sicherungskopien & temporäre Dateien
+*~
+*.bak
+*.swp
+*.tmp
+
+# VSCode / IDE Dateien
+.vscode/
+.idea/
+
+# Weitere ML-Dateitypen
+*.h5
+*.pt
+*.ckpt
+*.onnx
+
+# Komprimierte Archive & Installers
+*.tar.gz
+*.whl
