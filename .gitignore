@@ -6,7 +6,6 @@ __pycache__/
 /data/CNN_training_data/
 /data/paper_data/
 /logs/
-/models/
 /checkpoints/
 
 # Jupyter Notebooks Checkpoints
