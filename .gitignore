@@ -7,6 +7,7 @@ __pycache__/
 /data/paper_data/
 /logs/
 /checkpoints/
+/models/
 
 # Jupyter Notebooks Checkpoints
 .ipynb_checkpoints/
